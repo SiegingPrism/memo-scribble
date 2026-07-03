@@ -127,13 +127,13 @@ export function TopBar({
         onChange={(e) => importFile(e.target.files)}
       />
       <button className={btn} title="Import" onClick={() => fileRef.current?.click()}>
-        <Upload className="h-4.5 w-4.5" />
+        <Upload className="h-5 w-5" />
       </button>
 
       <Popover>
         <PopoverTrigger asChild>
           <button className={btn} title="Export">
-            <Download className="h-4.5 w-4.5" />
+            <Download className="h-5 w-5" />
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-40 p-1">
@@ -153,31 +153,31 @@ export function TopBar({
       </Popover>
 
       <button className={btn} title="QR share" onClick={shareQR}>
-        <QrCode className="h-4.5 w-4.5" />
+        <QrCode className="h-5 w-5" />
       </button>
 
       <div className="mx-1 h-6 w-px bg-border" />
 
       <button className={btn} title="Undo" onClick={undo}>
-        <Undo2 className="h-4.5 w-4.5" />
+        <Undo2 className="h-5 w-5" />
       </button>
       <button className={btn} title="Redo" onClick={redo}>
-        <Redo2 className="h-4.5 w-4.5" />
+        <Redo2 className="h-5 w-5" />
       </button>
 
       <div className="mx-1 h-6 w-px bg-border" />
 
       <button className={btn} onClick={prevPage} title="Previous">
-        <ChevronLeft className="h-4.5 w-4.5" />
+        <ChevronLeft className="h-5 w-5" />
       </button>
       <div className="min-w-14 rounded px-2 text-center text-sm font-medium tabular-nums text-foreground">
         {pad2(idx + 1)}/{pad2(pages.length)}
       </div>
       <button className={btn} onClick={nextPage} title="Next">
-        <ChevronRight className="h-4.5 w-4.5" />
+        <ChevronRight className="h-5 w-5" />
       </button>
       <button className={btn} onClick={addPage} title="Add page">
-        <Plus className="h-4.5 w-4.5" />
+        <Plus className="h-5 w-5" />
       </button>
 
       <div className="mx-1 h-6 w-px bg-border" />
@@ -185,7 +185,7 @@ export function TopBar({
       <Popover>
         <PopoverTrigger asChild>
           <button className={btn} title="Background">
-            <Grid3x3 className="h-4.5 w-4.5" />
+            <Grid3x3 className="h-5 w-5" />
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-44 p-1">
@@ -205,10 +205,10 @@ export function TopBar({
       </Popover>
 
       <button className={btn} onClick={onOpenWidgets} title="Widgets">
-        <Package className="h-4.5 w-4.5" />
+        <Package className="h-5 w-5" />
       </button>
       <button className={btn} onClick={onOpenAI} title="AI Assistant">
-        <MessageSquare className="h-4.5 w-4.5 text-primary" />
+        <MessageSquare className="h-5 w-5 text-primary" />
       </button>
 
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
