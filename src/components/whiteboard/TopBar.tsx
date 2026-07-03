@@ -1,0 +1,232 @@
+import { useRef, useState } from "react";
+import { useWhiteboard } from "@/lib/whiteboard/store";
+import type { ImageObject } from "@/lib/whiteboard/types";
+import {
+  Upload,
+  Download,
+  QrCode,
+  Undo2,
+  Redo2,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Grid3x3,
+  Layout,
+  MessageSquare,
+  Package,
+} from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import jsPDF from "jspdf";
+import QRCode from "qrcode";
+import { toast } from "sonner";
+
+function uid() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+export function TopBar({
+  onOpenAI,
+  onOpenWidgets,
+}: {
+  onOpenAI: () => void;
+  onOpenWidgets: () => void;
+}) {
+  const {
+    pages,
+    activePageId,
+    prevPage,
+    nextPage,
+    addPage,
+    undo,
+    redo,
+    setBackground,
+    addObject,
+    pushHistory,
+  } = useWhiteboard();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [qrOpen, setQrOpen] = useState(false);
+  const [qrData, setQrData] = useState<string>("");
+
+  const idx = pages.findIndex((p) => p.id === activePageId);
+  const page = pages[idx];
+  const pad2 = (n: number) => n.toString().padStart(2, "0");
+
+  function exportPNG() {
+    const c = document.querySelector<HTMLCanvasElement>("canvas");
+    if (!c) return;
+    const link = document.createElement("a");
+    link.download = `whiteboard-${pad2(idx + 1)}.png`;
+    link.href = c.toDataURL("image/png");
+    link.click();
+  }
+
+  function exportPDF() {
+    const c = document.querySelector<HTMLCanvasElement>("canvas");
+    if (!c) return;
+    const img = c.toDataURL("image/png");
+    const pdf = new jsPDF({
+      orientation: c.width > c.height ? "landscape" : "portrait",
+      unit: "px",
+      format: [c.width, c.height],
+    });
+    pdf.addImage(img, "PNG", 0, 0, c.width, c.height);
+    pdf.save(`whiteboard-${pad2(idx + 1)}.pdf`);
+  }
+
+  async function shareQR() {
+    const c = document.querySelector<HTMLCanvasElement>("canvas");
+    if (!c) return;
+    const dataUrl = c.toDataURL("image/png");
+    const qr = await QRCode.toDataURL(window.location.href, { margin: 1, width: 320 });
+    setQrData(qr);
+    setQrOpen(true);
+    // Also let user download PNG in same panel
+    void dataUrl;
+  }
+
+  function importFile(files: FileList | null) {
+    if (!files?.length) return;
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      const src = reader.result as string;
+      const img = new Image();
+      img.onload = () => {
+        const maxW = 400;
+        const w = Math.min(maxW, img.width);
+        const h = (img.height / img.width) * w;
+        const obj: ImageObject = {
+          id: uid(),
+          kind: "image",
+          x: 100,
+          y: 100,
+          w,
+          h,
+          src,
+        };
+        addObject(obj);
+        pushHistory();
+        toast.success("Image added");
+      };
+      img.src = src;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const btn =
+    "grid h-10 w-10 place-items-center rounded-lg text-foreground hover:bg-accent transition";
+
+  return (
+    <div className="pointer-events-auto flex flex-wrap items-center gap-1 rounded-2xl bg-card/95 p-1.5 shadow-lg ring-1 ring-border backdrop-blur">
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => importFile(e.target.files)}
+      />
+      <button className={btn} title="Import" onClick={() => fileRef.current?.click()}>
+        <Upload className="h-5 w-5" />
+      </button>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <button className={btn} title="Export">
+            <Download className="h-5 w-5" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-40 p-1">
+          <button
+            className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent"
+            onClick={exportPNG}
+          >
+            <Download className="h-4 w-4" /> PNG image
+          </button>
+          <button
+            className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent"
+            onClick={exportPDF}
+          >
+            <Download className="h-4 w-4" /> PDF file
+          </button>
+        </PopoverContent>
+      </Popover>
+
+      <button className={btn} title="QR share" onClick={shareQR}>
+        <QrCode className="h-5 w-5" />
+      </button>
+
+      <div className="mx-1 h-6 w-px bg-border" />
+
+      <button className={btn} title="Undo" onClick={undo}>
+        <Undo2 className="h-5 w-5" />
+      </button>
+      <button className={btn} title="Redo" onClick={redo}>
+        <Redo2 className="h-5 w-5" />
+      </button>
+
+      <div className="mx-1 h-6 w-px bg-border" />
+
+      <button className={btn} onClick={prevPage} title="Previous">
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+      <div className="min-w-14 rounded px-2 text-center text-sm font-medium tabular-nums text-foreground">
+        {pad2(idx + 1)}/{pad2(pages.length)}
+      </div>
+      <button className={btn} onClick={nextPage} title="Next">
+        <ChevronRight className="h-5 w-5" />
+      </button>
+      <button className={btn} onClick={addPage} title="Add page">
+        <Plus className="h-5 w-5" />
+      </button>
+
+      <div className="mx-1 h-6 w-px bg-border" />
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <button className={btn} title="Background">
+            <Grid3x3 className="h-5 w-5" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-44 p-1">
+          {(["white", "grid", "dots", "lined", "dark"] as const).map((bg) => (
+            <button
+              key={bg}
+              onClick={() => setBackground(bg)}
+              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm capitalize hover:bg-accent"
+            >
+              <Layout className="h-4 w-4" /> {bg}
+              {page.background === bg && (
+                <span className="ml-auto text-xs text-primary">✓</span>
+              )}
+            </button>
+          ))}
+        </PopoverContent>
+      </Popover>
+
+      <button className={btn} onClick={onOpenWidgets} title="Widgets">
+        <Package className="h-5 w-5" />
+      </button>
+      <button className={btn} onClick={onOpenAI} title="AI Assistant">
+        <MessageSquare className="h-5 w-5 text-primary" />
+      </button>
+
+      <Dialog open={qrOpen} onOpenChange={setQrOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Scan to open this board</DialogTitle>
+          </DialogHeader>
+          {qrData && (
+            <div className="flex flex-col items-center gap-3">
+              <img src={qrData} alt="QR code" className="rounded-lg border" />
+              <p className="text-xs text-muted-foreground text-center">
+                Scan with a mobile device to open this whiteboard URL.
+                Use Export to save the notes as image or PDF.
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
