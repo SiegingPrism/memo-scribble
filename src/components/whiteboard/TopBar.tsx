@@ -14,7 +14,9 @@ import {
   Layout,
   MessageSquare,
   Package,
+  ArrowLeft,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import jsPDF from "jspdf";
@@ -28,9 +30,11 @@ function uid() {
 export function TopBar({
   onOpenAI,
   onOpenWidgets,
+  boardTitle,
 }: {
   onOpenAI: () => void;
   onOpenWidgets: () => void;
+  boardTitle?: string;
 }) {
   const {
     pages,
@@ -119,6 +123,15 @@ export function TopBar({
 
   return (
     <div className="pointer-events-auto flex flex-wrap items-center gap-1 rounded-2xl bg-card/95 p-1.5 shadow-lg ring-1 ring-border backdrop-blur">
+      <Link to="/" className={btn} title="Dashboard">
+        <ArrowLeft className="h-5 w-5" />
+      </Link>
+      {boardTitle && (
+        <div className="hidden max-w-[180px] truncate px-2 text-sm font-medium sm:block" title={boardTitle}>
+          {boardTitle}
+        </div>
+      )}
+      <div className="mx-1 h-6 w-px bg-border" />
       <input
         ref={fileRef}
         type="file"
@@ -129,6 +142,7 @@ export function TopBar({
       <button className={btn} title="Import" onClick={() => fileRef.current?.click()}>
         <Upload className="h-5 w-5" />
       </button>
+
 
       <Popover>
         <PopoverTrigger asChild>
