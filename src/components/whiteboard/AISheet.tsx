@@ -99,6 +99,9 @@ export function AISheet({
           return copy;
         });
       }
+      if (acc.trim()) {
+        addRecentAI({ prompt: clean, response: acc, boardId: boardId ?? null });
+      }
     } catch (e) {
       console.error(e);
       toast.error("AI request failed");
