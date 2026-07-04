@@ -17,15 +17,20 @@ function uid() {
   return Math.random().toString(36).slice(2, 10);
 }
 
+import { useWhiteboard } from "@/lib/whiteboard/store";
+
 export function AISheet({
   open,
   onOpenChange,
   contextText,
+  boardId,
 }: {
   open: boolean;
   onOpenChange: (b: boolean) => void;
   contextText?: string;
+  boardId?: string;
 }) {
+  const addRecentAI = useWhiteboard((s) => s.addRecentAI);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
