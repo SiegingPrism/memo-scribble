@@ -68,6 +68,42 @@ export type StickyNoteObject = {
   color: string;
 };
 
+// ---- Feature objects (stubbed for AI Studio + future feature modules) ----
+type BoxBase = { id: string; x: number; y: number; w: number; h: number };
+
+export type FlashcardObject = BoxBase & {
+  kind: "flashcard";
+  front: string;
+  back: string;
+  color: string;
+  flipped?: boolean;
+};
+export type QuizObject = BoxBase & {
+  kind: "quiz";
+  question: string;
+  options: string[];
+  answerIndex: number;
+};
+export type RoadmapNodeObject = BoxBase & {
+  kind: "roadmap";
+  title: string;
+  status: "todo" | "doing" | "done";
+  color: string;
+};
+export type TimelineObject = BoxBase & {
+  kind: "timeline";
+  title: string;
+  events: Array<{ date: string; label: string }>;
+};
+export type UMLObject = BoxBase & {
+  kind: "uml";
+  umlType: "class" | "actor" | "box";
+  title: string;
+  lines: string[];
+};
+export type VideoObject = BoxBase & { kind: "video"; src: string; title?: string };
+export type AudioObject = BoxBase & { kind: "audio"; src: string; title?: string };
+
 export type CanvasObject =
   | PenStroke
   | HighlighterStroke
@@ -76,7 +112,16 @@ export type CanvasObject =
   | ShapeStroke
   | TextObject
   | ImageObject
-  | StickyNoteObject;
+  | StickyNoteObject
+  | FlashcardObject
+  | QuizObject
+  | RoadmapNodeObject
+  | TimelineObject
+  | UMLObject
+  | VideoObject
+  | AudioObject;
+
+export type CanvasObjectKind = CanvasObject["kind"];
 
 export type Page = {
   id: string;
@@ -90,7 +135,7 @@ export type WhiteboardState = {
   tool: ToolId;
   color: string;
   size: number;
-  history: Page[][]; // snapshots of pages
+  history: Page[][];
   historyIndex: number;
   selectedId: string | null;
   camera: { x: number; y: number; zoom: number };
