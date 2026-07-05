@@ -1,24 +1,16 @@
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import {
-  Timer,
-  Clock,
-  Dices,
-  Trophy,
-  Calculator,
-  StickyNote,
-  ImagePlus,
-  Ruler,
-  Table as TableIcon,
-} from "lucide-react";
+import { ImagePlus, Ruler, StickyNote, Table as TableIcon } from "lucide-react";
 import { useWhiteboard } from "@/lib/whiteboard/store";
 import type { StickyNoteObject } from "@/lib/whiteboard/types";
+import { getAllWidgets, type WidgetDef } from "@/lib/registry/widgetRegistry";
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
 }
 
-export type WidgetKind = "timer" | "stopwatch" | "dice" | "score" | "calculator";
+/** Widget kinds are just registry ids now. */
+export type WidgetKind = string;
 
 export function WidgetsSheet({
   open,
@@ -30,6 +22,8 @@ export function WidgetsSheet({
   onLaunch: (kind: WidgetKind) => void;
 }) {
   const { addObject, pushHistory } = useWhiteboard();
+  const widgets = getAllWidgets();
+  const classroom = widgets.filter((w) => w.category === "classroom" || w.category === "utility");
 
   function addSticky() {
     const colors = ["#fef08a", "#bbf7d0", "#bae6fd", "#fbcfe8", "#fed7aa"];
@@ -48,14 +42,6 @@ export function WidgetsSheet({
     onOpenChange(false);
   }
 
-  const items = [
-    { kind: "timer" as const, label: "Timer", icon: Timer, color: "bg-orange-500/10 text-orange-500" },
-    { kind: "stopwatch" as const, label: "Stopwatch", icon: Clock, color: "bg-blue-500/10 text-blue-500" },
-    { kind: "dice" as const, label: "Dice", icon: Dices, color: "bg-purple-500/10 text-purple-500" },
-    { kind: "score" as const, label: "Scoreboard", icon: Trophy, color: "bg-yellow-500/10 text-yellow-500" },
-    { kind: "calculator" as const, label: "Calculator", icon: Calculator, color: "bg-emerald-500/10 text-emerald-500" },
-  ];
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md">
@@ -68,21 +54,21 @@ export function WidgetsSheet({
               Classroom
             </h3>
             <div className="grid grid-cols-3 gap-2">
-              {items.map((it) => {
-                const Icon = it.icon;
+              {classroom.map((w: WidgetDef) => {
+                const Icon = w.icon;
                 return (
                   <button
-                    key={it.kind}
+                    key={w.id}
                     onClick={() => {
-                      onLaunch(it.kind);
+                      onLaunch(w.id);
                       onOpenChange(false);
                     }}
                     className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-3 text-center transition hover:bg-accent"
                   >
-                    <span className={`grid h-10 w-10 place-items-center rounded-lg ${it.color}`}>
+                    <span className={`grid h-10 w-10 place-items-center rounded-lg ${w.accentClass}`}>
                       <Icon className="h-5 w-5" />
                     </span>
-                    <span className="text-xs font-medium">{it.label}</span>
+                    <span className="text-xs font-medium">{w.label}</span>
                   </button>
                 );
               })}
@@ -108,7 +94,8 @@ export function WidgetsSheet({
               <DisabledCard icon={TableIcon} label="Table" />
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              More tools (ruler, protractor, table, media) coming soon — this build ships with the essential set.
+              New object types (Flashcard, Quiz, Roadmap, Timeline, UML, Video, Audio) are registered
+              and can be generated via AI Studio.
             </p>
           </section>
         </div>
