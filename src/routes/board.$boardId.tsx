@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { WhiteboardCanvas } from "@/components/whiteboard/Canvas";
 import { Toolbar } from "@/components/whiteboard/Toolbar";
@@ -6,15 +6,11 @@ import { TopBar } from "@/components/whiteboard/TopBar";
 import { WidgetsSheet, useWidgetLauncher } from "@/components/whiteboard/WidgetsSheet";
 import { AISheet } from "@/components/whiteboard/AISheet";
 import { FloatingWidget } from "@/components/whiteboard/FloatingWidget";
-import {
-  CalculatorWidget,
-  DiceWidget,
-  ScoreWidget,
-  StopwatchWidget,
-  TimerWidget,
-} from "@/components/whiteboard/widgets/BasicWidgets";
+import { getWidget } from "@/lib/registry/widgetRegistry";
+import "@/lib/registry/featureRegistry"; // side-effect: load feature modules
 import { useWhiteboard } from "@/lib/whiteboard/store";
 import { Wand2 } from "lucide-react";
+
 
 export const Route = createFileRoute("/board/$boardId")({
   head: () => ({
