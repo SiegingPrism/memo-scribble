@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { WhiteboardCanvas } from "@/components/whiteboard/Canvas";
 import { Toolbar } from "@/components/whiteboard/Toolbar";
@@ -6,15 +6,11 @@ import { TopBar } from "@/components/whiteboard/TopBar";
 import { WidgetsSheet, useWidgetLauncher } from "@/components/whiteboard/WidgetsSheet";
 import { AISheet } from "@/components/whiteboard/AISheet";
 import { FloatingWidget } from "@/components/whiteboard/FloatingWidget";
-import {
-  CalculatorWidget,
-  DiceWidget,
-  ScoreWidget,
-  StopwatchWidget,
-  TimerWidget,
-} from "@/components/whiteboard/widgets/BasicWidgets";
+import { getWidget } from "@/lib/registry/widgetRegistry";
+import "@/lib/registry/featureRegistry"; // side-effect: load feature modules
 import { useWhiteboard } from "@/lib/whiteboard/store";
 import { Wand2 } from "lucide-react";
+
 
 export const Route = createFileRoute("/board/$boardId")({
   head: () => ({
@@ -110,31 +106,22 @@ function BoardPage() {
       <WidgetsSheet open={widgetsOpen} onOpenChange={setWidgetsOpen} onLaunch={launch} />
       <AISheet open={aiOpen} onOpenChange={setAIOpen} contextText={contextText} boardId={boardId} />
 
-      {openWidgets.map((w) => (
-        <FloatingWidget
-          key={w.id}
-          title={titleFor(w.kind)}
-          initial={{ x: w.x, y: w.y }}
-          onClose={() => close(w.id)}
-        >
-          {w.kind === "timer" && <TimerWidget />}
-          {w.kind === "stopwatch" && <StopwatchWidget />}
-          {w.kind === "dice" && <DiceWidget />}
-          {w.kind === "score" && <ScoreWidget />}
-          {w.kind === "calculator" && <CalculatorWidget />}
-        </FloatingWidget>
-      ))}
+      {openWidgets.map((w) => {
+        const def = getWidget(w.kind);
+        if (!def) return null;
+        const Component = def.component;
+        return (
+          <FloatingWidget
+            key={w.id}
+            title={def.label}
+            initial={{ x: w.x, y: w.y }}
+            onClose={() => close(w.id)}
+          >
+            <Component />
+          </FloatingWidget>
+        );
+      })}
     </div>
   );
 }
 
-function titleFor(k: string) {
-  switch (k) {
-    case "timer": return "Timer";
-    case "stopwatch": return "Stopwatch";
-    case "dice": return "Dice";
-    case "score": return "Scoreboard";
-    case "calculator": return "Calculator";
-    default: return k;
-  }
-}

@@ -1,39 +1,10 @@
 import { useState } from "react";
 import { useWhiteboard } from "@/lib/whiteboard/store";
-import type { ToolId } from "@/lib/whiteboard/types";
-import {
-  MousePointer2,
-  Hand,
-  Pen,
-  Highlighter,
-  Sparkles,
-  Minus,
-  Zap,
-  Shapes,
-  Eraser,
-  Trash2,
-  Type,
-  Palette,
-} from "lucide-react";
+import { getAllTools, type ToolDef } from "@/lib/registry/toolRegistry";
+import { Palette, Trash2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
-
-type ToolBtn = { id: ToolId; label: string; icon: React.ComponentType<{ className?: string }> };
-
-const TOOLS: ToolBtn[] = [
-  { id: "select", label: "Select", icon: MousePointer2 },
-  { id: "pan", label: "Move", icon: Hand },
-  { id: "pen", label: "Pen", icon: Pen },
-  { id: "highlighter", label: "Highlighter", icon: Highlighter },
-  { id: "rainbow", label: "Rainbow", icon: Sparkles },
-  { id: "dashed", label: "Dashed", icon: Minus },
-  { id: "laser", label: "Laser", icon: Zap },
-  { id: "shape", label: "Shape", icon: Shapes },
-  { id: "text", label: "Text", icon: Type },
-  { id: "eraser-pixel", label: "Erase", icon: Eraser },
-  { id: "eraser-object", label: "Erase object", icon: Trash2 },
-];
 
 const PALETTE = [
   "#111827", "#ef4444", "#f97316", "#eab308", "#22c55e",
@@ -43,18 +14,19 @@ const PALETTE = [
 export function Toolbar() {
   const { tool, setTool, color, setColor, size, setSize, clearPage, pushHistory } = useWhiteboard();
   const [swipe, setSwipe] = useState(0);
+  const tools: ToolDef[] = getAllTools();
 
   return (
     <div className="pointer-events-auto flex flex-col items-center gap-2 rounded-2xl bg-card/95 p-2 shadow-lg ring-1 ring-border backdrop-blur">
       <div className="grid grid-cols-2 gap-1 lg:grid-cols-1">
-        {TOOLS.map((t) => {
+        {tools.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
           return (
             <button
               key={t.id}
               onClick={() => setTool(t.id)}
-              title={t.label}
+              title={t.shortcut ? `${t.label} (${t.shortcut})` : t.label}
               className={cn(
                 "grid h-10 w-10 place-items-center rounded-lg transition",
                 active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent",
