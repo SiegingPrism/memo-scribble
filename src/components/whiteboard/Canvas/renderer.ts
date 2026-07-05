@@ -128,13 +128,13 @@ const boxBounds = (o: { x: number; y: number; w: number; h: number }) => ({
   x: o.x, y: o.y, w: o.w, h: o.h,
 });
 
-registerObject({
+registerObject<import("@/lib/whiteboard/types").PenStroke>({
   kind: "pen",
   label: "Pen",
   draw: (o, { ctx }) => drawStroke(ctx, o, o.color, o.size, 1),
   bounds: (o) => pointsBounds(o.points),
 });
-registerObject({
+registerObject<import("@/lib/whiteboard/types").HighlighterStroke>({
   kind: "highlighter",
   label: "Highlighter",
   draw: (o, { ctx }) => {
@@ -143,13 +143,13 @@ registerObject({
   },
   bounds: (o) => pointsBounds(o.points),
 });
-registerObject({
+registerObject<import("@/lib/whiteboard/types").RainbowStroke>({
   kind: "rainbow",
   label: "Rainbow",
   draw: (o, { ctx }) => drawRainbow(ctx, o),
   bounds: (o) => pointsBounds(o.points),
 });
-registerObject({
+registerObject<import("@/lib/whiteboard/types").DashedStroke>({
   kind: "dashed",
   label: "Dashed",
   draw: (o, { ctx }) => {
@@ -158,30 +158,31 @@ registerObject({
   },
   bounds: (o) => pointsBounds(o.points),
 });
-registerObject({
+registerObject<import("@/lib/whiteboard/types").ShapeStroke>({
   kind: "shape",
   label: "Shape",
   draw: (o, { ctx }) => drawShape(ctx, o),
   bounds: boxBounds,
 });
-registerObject({
+registerObject<TextObject>({
   kind: "text",
   label: "Text",
   draw: (o, { ctx }) => drawText(ctx, o),
   bounds: boxBounds,
 });
-registerObject({
+registerObject<StickyNoteObject>({
   kind: "sticky",
   label: "Sticky note",
   draw: (o, { ctx }) => drawSticky(ctx, o),
   bounds: boxBounds,
 });
-registerObject({
+registerObject<ImageObject>({
   kind: "image",
   label: "Image",
   draw: (o, rc) => drawImage(o, rc),
   bounds: boxBounds,
 });
+
 
 // Feature stubs — placeholder renderers so AI Studio can drop them onto boards.
 registerObject<FlashcardObject>({
