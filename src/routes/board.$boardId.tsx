@@ -106,31 +106,22 @@ function BoardPage() {
       <WidgetsSheet open={widgetsOpen} onOpenChange={setWidgetsOpen} onLaunch={launch} />
       <AISheet open={aiOpen} onOpenChange={setAIOpen} contextText={contextText} boardId={boardId} />
 
-      {openWidgets.map((w) => (
-        <FloatingWidget
-          key={w.id}
-          title={titleFor(w.kind)}
-          initial={{ x: w.x, y: w.y }}
-          onClose={() => close(w.id)}
-        >
-          {w.kind === "timer" && <TimerWidget />}
-          {w.kind === "stopwatch" && <StopwatchWidget />}
-          {w.kind === "dice" && <DiceWidget />}
-          {w.kind === "score" && <ScoreWidget />}
-          {w.kind === "calculator" && <CalculatorWidget />}
-        </FloatingWidget>
-      ))}
+      {openWidgets.map((w) => {
+        const def = getWidget(w.kind);
+        if (!def) return null;
+        const Component = def.component;
+        return (
+          <FloatingWidget
+            key={w.id}
+            title={def.label}
+            initial={{ x: w.x, y: w.y }}
+            onClose={() => close(w.id)}
+          >
+            <Component />
+          </FloatingWidget>
+        );
+      })}
     </div>
   );
 }
 
-function titleFor(k: string) {
-  switch (k) {
-    case "timer": return "Timer";
-    case "stopwatch": return "Stopwatch";
-    case "dice": return "Dice";
-    case "score": return "Scoreboard";
-    case "calculator": return "Calculator";
-    default: return k;
-  }
-}
