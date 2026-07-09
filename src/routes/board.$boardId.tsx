@@ -45,6 +45,7 @@ function BoardPage() {
     boards,
     boardData,
     openBoard,
+    setBoardThumbnail,
   } = useWhiteboard();
 
   useEffect(() => {
@@ -54,6 +55,20 @@ function BoardPage() {
     }
     if (activeBoardId !== boardId) openBoard(boardId);
   }, [boardId, boardData, activeBoardId, openBoard, navigate]);
+
+  // Debounced thumbnail regeneration when pages change
+  useEffect(() => {
+    if (activeBoardId !== boardId) return;
+    const t = window.setTimeout(async () => {
+      const { generatePageThumbnail } = await import("@/lib/whiteboard/thumbnail");
+      const first = pages[0];
+      if (!first) return;
+      const url = generatePageThumbnail(first);
+      if (url) setBoardThumbnail(boardId, url);
+    }, 1200);
+    return () => window.clearTimeout(t);
+  }, [pages, boardId, activeBoardId, setBoardThumbnail]);
+
 
   const board = boards[boardId];
   const ready = activeBoardId === boardId && pages.length > 0;
