@@ -404,6 +404,16 @@ export const useWhiteboard = create<State & Actions>((set, get) => {
       persistMeta(next);
       set(next);
     },
+    setBoardThumbnail: (id, dataUrl) => {
+      const s = get();
+      if (!s.boards[id]) return;
+      if (s.boards[id].thumbnail === dataUrl) return;
+      const boards = { ...s.boards, [id]: { ...s.boards[id], thumbnail: dataUrl } };
+      const next = { ...s, boards };
+      persistMeta(next);
+      set(next);
+    },
+
 
     createFolder: (name) => {
       const s = get();
