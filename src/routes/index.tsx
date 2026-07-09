@@ -50,10 +50,11 @@ function Dashboard() {
   const continueBoard = sorted[0];
   const recent = sorted.slice(0, 8);
 
-  function openNew(templateKey?: TemplateKey) {
-    const id = createBoard({ templateKey });
+  function openNew() {
+    const id = createBoard();
     navigate({ to: "/board/$boardId", params: { boardId: id } });
   }
+
 
   return (
     <div className="min-h-dvh bg-background">
@@ -120,7 +121,7 @@ function Dashboard() {
               icon={<Plus className="h-5 w-5" />}
               title="Blank board"
               subtitle="Start with a clean canvas"
-              onClick={() => openNew("blank")}
+              onClick={() => openNew()}
             />
             <QuickCard
               icon={<FolderOpen className="h-5 w-5" />}
@@ -132,33 +133,11 @@ function Dashboard() {
               icon={<Sparkles className="h-5 w-5" />}
               title="AI-assisted board"
               subtitle="Start blank and open the AI helper"
-              onClick={() => openNew("blank")}
+              onClick={() => openNew()}
             />
           </div>
         </section>
 
-        {/* Templates */}
-        <section>
-          <SectionHeader title="Templates" />
-          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-            {TEMPLATES.map((t) => (
-              <button
-                key={t.key}
-                onClick={() => openNew(t.key)}
-                className="group flex flex-col items-start gap-2 rounded-xl border bg-card p-4 text-left transition hover:border-primary hover:shadow-sm"
-              >
-                <div className="text-2xl">{t.emoji}</div>
-                <div>
-                  <div className="text-sm font-semibold">{t.title}</div>
-                  <div className="mt-0.5 text-xs text-muted-foreground">{t.description}</div>
-                </div>
-                <span className="mt-auto text-[10px] font-medium uppercase tracking-wide text-primary">
-                  {t.category}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
 
         {/* Recent Boards */}
         <section>
