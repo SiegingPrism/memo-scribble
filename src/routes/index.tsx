@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useWhiteboard } from "@/lib/whiteboard/store";
-import { TEMPLATES, type TemplateKey } from "@/lib/whiteboard/templates";
 import { Button } from "@/components/ui/button";
 import {
   Plus,
@@ -13,6 +12,7 @@ import {
   Star,
   Wand2,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -50,10 +50,11 @@ function Dashboard() {
   const continueBoard = sorted[0];
   const recent = sorted.slice(0, 8);
 
-  function openNew(templateKey?: TemplateKey) {
-    const id = createBoard({ templateKey });
+  function openNew() {
+    const id = createBoard();
     navigate({ to: "/board/$boardId", params: { boardId: id } });
   }
+
 
   return (
     <div className="min-h-dvh bg-background">
@@ -120,7 +121,7 @@ function Dashboard() {
               icon={<Plus className="h-5 w-5" />}
               title="Blank board"
               subtitle="Start with a clean canvas"
-              onClick={() => openNew("blank")}
+              onClick={() => openNew()}
             />
             <QuickCard
               icon={<FolderOpen className="h-5 w-5" />}
@@ -132,33 +133,11 @@ function Dashboard() {
               icon={<Sparkles className="h-5 w-5" />}
               title="AI-assisted board"
               subtitle="Start blank and open the AI helper"
-              onClick={() => openNew("blank")}
+              onClick={() => openNew()}
             />
           </div>
         </section>
 
-        {/* Templates */}
-        <section>
-          <SectionHeader title="Templates" />
-          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-            {TEMPLATES.map((t) => (
-              <button
-                key={t.key}
-                onClick={() => openNew(t.key)}
-                className="group flex flex-col items-start gap-2 rounded-xl border bg-card p-4 text-left transition hover:border-primary hover:shadow-sm"
-              >
-                <div className="text-2xl">{t.emoji}</div>
-                <div>
-                  <div className="text-sm font-semibold">{t.title}</div>
-                  <div className="mt-0.5 text-xs text-muted-foreground">{t.description}</div>
-                </div>
-                <span className="mt-auto text-[10px] font-medium uppercase tracking-wide text-primary">
-                  {t.category}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
 
         {/* Recent Boards */}
         <section>
@@ -182,15 +161,31 @@ function Dashboard() {
                 <button
                   key={b.id}
                   onClick={() => navigate({ to: "/board/$boardId", params: { boardId: b.id } })}
-                  className="flex aspect-[4/3] flex-col justify-end rounded-xl border bg-gradient-to-br from-muted/40 to-muted p-3 text-left transition hover:border-primary hover:shadow-sm"
+                  className="group flex aspect-[4/3] flex-col overflow-hidden rounded-xl border bg-card text-left shadow-sm transition hover:border-primary hover:shadow-md"
                 >
-                  <div className="flex items-center gap-1.5 text-sm font-medium">
-                    {b.favorite && <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />}
-                    <span className="truncate">{b.title}</span>
+                  <div className="relative flex-1 overflow-hidden bg-gradient-to-br from-muted/40 to-muted">
+                    {b.thumbnail ? (
+                      <img
+                        src={b.thumbnail}
+                        alt=""
+                        className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">
+                        Empty board
+                      </div>
+                    )}
                   </div>
-                  <div className="text-xs text-muted-foreground">{relTime(b.updatedAt)}</div>
+                  <div className="border-t p-2">
+                    <div className="flex items-center gap-1.5 text-sm font-medium">
+                      {b.favorite && <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />}
+                      <span className="truncate">{b.title}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">{relTime(b.updatedAt)}</div>
+                  </div>
                 </button>
               ))}
+
             </div>
           )}
         </section>

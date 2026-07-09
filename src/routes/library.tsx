@@ -305,14 +305,23 @@ function Library() {
               {visible.map((b) => (
                 <div
                   key={b.id}
-                  className="group relative flex aspect-[4/3] flex-col justify-end rounded-xl border bg-gradient-to-br from-muted/40 to-muted p-3 text-left transition hover:border-primary hover:shadow-sm"
+                  className="group relative flex aspect-[4/3] flex-col overflow-hidden rounded-xl border bg-card text-left shadow-sm transition hover:border-primary hover:shadow-md"
                 >
                   <button
                     onClick={() => navigate({ to: "/board/$boardId", params: { boardId: b.id } })}
-                    className="absolute inset-0 rounded-xl"
+                    className="absolute inset-0 z-0"
                     aria-label={`Open ${b.title}`}
                   />
-                  <div className="relative z-10 flex items-center justify-between gap-2">
+                  <div className="pointer-events-none relative flex-1 overflow-hidden bg-gradient-to-br from-muted/40 to-muted">
+                    {b.thumbnail ? (
+                      <img src={b.thumbnail} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">
+                        Empty board
+                      </div>
+                    )}
+                  </div>
+                  <div className="relative z-10 flex items-center justify-between gap-2 border-t bg-card p-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 text-sm font-medium">
                         {b.favorite && <Star className="h-3.5 w-3.5 shrink-0 fill-yellow-400 text-yellow-400" />}
@@ -344,6 +353,7 @@ function Library() {
                   </div>
                 </div>
               ))}
+
             </div>
           ) : (
             <div className="overflow-hidden rounded-xl border">
