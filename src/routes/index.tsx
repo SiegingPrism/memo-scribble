@@ -161,15 +161,31 @@ function Dashboard() {
                 <button
                   key={b.id}
                   onClick={() => navigate({ to: "/board/$boardId", params: { boardId: b.id } })}
-                  className="flex aspect-[4/3] flex-col justify-end rounded-xl border bg-gradient-to-br from-muted/40 to-muted p-3 text-left transition hover:border-primary hover:shadow-sm"
+                  className="group flex aspect-[4/3] flex-col overflow-hidden rounded-xl border bg-card text-left shadow-sm transition hover:border-primary hover:shadow-md"
                 >
-                  <div className="flex items-center gap-1.5 text-sm font-medium">
-                    {b.favorite && <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />}
-                    <span className="truncate">{b.title}</span>
+                  <div className="relative flex-1 overflow-hidden bg-gradient-to-br from-muted/40 to-muted">
+                    {b.thumbnail ? (
+                      <img
+                        src={b.thumbnail}
+                        alt=""
+                        className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">
+                        Empty board
+                      </div>
+                    )}
                   </div>
-                  <div className="text-xs text-muted-foreground">{relTime(b.updatedAt)}</div>
+                  <div className="border-t p-2">
+                    <div className="flex items-center gap-1.5 text-sm font-medium">
+                      {b.favorite && <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />}
+                      <span className="truncate">{b.title}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">{relTime(b.updatedAt)}</div>
+                  </div>
                 </button>
               ))}
+
             </div>
           )}
         </section>
