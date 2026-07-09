@@ -132,12 +132,45 @@ export function TopBar({
       <Link to="/" className={btn} title="Dashboard">
         <ArrowLeft className="h-5 w-5" />
       </Link>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <button className={btn} title="Menu">
+            <Menu className="h-5 w-5" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-72 p-2" align="start">
+          <div className="mb-1 flex items-center gap-2 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <LayoutTemplate className="h-3.5 w-3.5" /> New from template
+          </div>
+          <div className="max-h-72 overflow-y-auto">
+            {TEMPLATES.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => {
+                  const id = createBoard({ templateKey: t.key as TemplateKey, title: t.title });
+                  navigate({ to: "/board/$boardId", params: { boardId: id } });
+                }}
+                className="flex w-full items-start gap-2 rounded px-2 py-1.5 text-left hover:bg-accent"
+              >
+                <span className="text-lg leading-none">{t.emoji}</span>
+                <div className="min-w-0">
+                  <div className="text-sm font-medium">{t.title}</div>
+                  <div className="truncate text-xs text-muted-foreground">{t.description}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+
       {boardTitle && (
         <div className="hidden max-w-[180px] truncate px-2 text-sm font-medium sm:block" title={boardTitle}>
           {boardTitle}
         </div>
       )}
       <div className="mx-1 h-6 w-px bg-border" />
+
       <input
         ref={fileRef}
         type="file"
