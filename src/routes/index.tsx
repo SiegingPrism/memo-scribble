@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useWhiteboard } from "@/lib/whiteboard/store";
-import { TEMPLATES, type TemplateKey } from "@/lib/whiteboard/templates";
 import { Button } from "@/components/ui/button";
 import {
   Plus,
@@ -13,6 +12,7 @@ import {
   Star,
   Wand2,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
