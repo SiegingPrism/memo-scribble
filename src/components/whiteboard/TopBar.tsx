@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useWhiteboard } from "@/lib/whiteboard/store";
 import type { ImageObject } from "@/lib/whiteboard/types";
+import { TEMPLATES, type TemplateKey } from "@/lib/whiteboard/templates";
 import {
   Upload,
   Download,
@@ -15,8 +16,10 @@ import {
   MessageSquare,
   Package,
   ArrowLeft,
+  Menu,
+  LayoutTemplate,
 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import jsPDF from "jspdf";
@@ -47,7 +50,10 @@ export function TopBar({
     setBackground,
     addObject,
     pushHistory,
+    createBoard,
   } = useWhiteboard();
+  const navigate = useNavigate();
+
   const fileRef = useRef<HTMLInputElement>(null);
   const [qrOpen, setQrOpen] = useState(false);
   const [qrData, setQrData] = useState<string>("");
