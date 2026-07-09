@@ -26,7 +26,9 @@ export type BoardMeta = {
   createdAt: number;
   updatedAt: number;
   templateKey?: TemplateKey;
+  thumbnail?: string;
 };
+
 export type Folder = { id: string; name: string };
 export type RecentAI = {
   id: string;
@@ -127,6 +129,8 @@ type Actions = {
   toggleArchive: (id: string) => void;
   setBoardTags: (id: string, tags: string[]) => void;
   setBoardFolder: (id: string, folderId: string | null) => void;
+  setBoardThumbnail: (id: string, dataUrl: string) => void;
+
   // Folders
   createFolder: (name: string) => string;
   renameFolder: (id: string, name: string) => void;
