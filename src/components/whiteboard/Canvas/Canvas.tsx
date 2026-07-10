@@ -245,7 +245,7 @@ export function WhiteboardCanvas() {
         animateLaserFade(overlay, dpr, camera, laserRef.current);
         return;
       }
-      const obj = finalizeStroke(tool, color, size, d.points);
+      const obj = finalizeStroke(tool, color, size, d.points, autoRecognizeShape);
       if (obj) {
         addObject(obj);
         pushHistory();
