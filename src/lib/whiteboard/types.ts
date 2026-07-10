@@ -24,10 +24,38 @@ export type PenStroke = StrokeBase & { kind: "pen" };
 export type HighlighterStroke = StrokeBase & { kind: "highlighter" };
 export type RainbowStroke = StrokeBase & { kind: "rainbow" };
 export type DashedStroke = StrokeBase & { kind: "dashed" };
+
+export type ShapeKind =
+  | "rect"
+  | "roundedRect"
+  | "circle"
+  | "ellipse"
+  | "triangle"
+  | "diamond"
+  | "pentagon"
+  | "hexagon"
+  | "octagon"
+  | "star"
+  | "heart"
+  | "line"
+  | "arrow"
+  | "doubleArrow"
+  | "elbowArrow"
+  | "process"
+  | "decision"
+  | "data"
+  | "terminator"
+  | "document"
+  | "database"
+  | "manualInput"
+  | "connector"
+  | "cloud"
+  | "speech";
+
 export type ShapeStroke = {
   id: string;
   kind: "shape";
-  shape: "rect" | "circle" | "triangle" | "line";
+  shape: ShapeKind;
   color: string;
   size: number;
   x: number;
@@ -35,7 +63,9 @@ export type ShapeStroke = {
   w: number;
   h: number;
   rotation?: number;
+  fill?: string;
 };
+
 export type TextObject = {
   id: string;
   kind: "text";
