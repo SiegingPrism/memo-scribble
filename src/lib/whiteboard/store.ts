@@ -1,6 +1,13 @@
 import { create } from "zustand";
-import type { CanvasObject, Page, ToolId, WhiteboardState } from "./types";
+import type {
+  BackgroundStyle,
+  CanvasObject,
+  Page,
+  ToolId,
+  WhiteboardState,
+} from "./types";
 import { pagesForTemplate, type TemplateKey } from "./templates";
+
 
 const STORAGE_KEY = "whiteboard.multi.v1";
 const LEGACY_KEY = "whiteboard.v1";
