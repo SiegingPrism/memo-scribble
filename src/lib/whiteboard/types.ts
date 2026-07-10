@@ -153,10 +153,18 @@ export type CanvasObject =
 
 export type CanvasObjectKind = CanvasObject["kind"];
 
+export type BackgroundStyle = "blank" | "grid" | "dots" | "lined";
+// Legacy union kept for backward compat with older saved boards.
+export type LegacyBackground = "white" | "grid" | "dots" | "lined" | "dark";
+
 export type Page = {
   id: string;
   objects: CanvasObject[];
-  background: "white" | "grid" | "dots" | "lined" | "dark";
+  /** Legacy field, still honored for old boards. */
+  background: LegacyBackground;
+  /** New: independent style + color. */
+  bgStyle?: BackgroundStyle;
+  bgColor?: string;
 };
 
 export type WhiteboardState = {
@@ -169,4 +177,9 @@ export type WhiteboardState = {
   historyIndex: number;
   selectedId: string | null;
   camera: { x: number; y: number; zoom: number };
+  toolColors: Partial<Record<ToolId, string>>;
+  recentColors: string[];
+  favoriteColors: string[];
+  autoRecognizeShape: boolean;
 };
+
