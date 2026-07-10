@@ -24,10 +24,38 @@ export type PenStroke = StrokeBase & { kind: "pen" };
 export type HighlighterStroke = StrokeBase & { kind: "highlighter" };
 export type RainbowStroke = StrokeBase & { kind: "rainbow" };
 export type DashedStroke = StrokeBase & { kind: "dashed" };
+
+export type ShapeKind =
+  | "rect"
+  | "roundedRect"
+  | "circle"
+  | "ellipse"
+  | "triangle"
+  | "diamond"
+  | "pentagon"
+  | "hexagon"
+  | "octagon"
+  | "star"
+  | "heart"
+  | "line"
+  | "arrow"
+  | "doubleArrow"
+  | "elbowArrow"
+  | "process"
+  | "decision"
+  | "data"
+  | "terminator"
+  | "document"
+  | "database"
+  | "manualInput"
+  | "connector"
+  | "cloud"
+  | "speech";
+
 export type ShapeStroke = {
   id: string;
   kind: "shape";
-  shape: "rect" | "circle" | "triangle" | "line";
+  shape: ShapeKind;
   color: string;
   size: number;
   x: number;
@@ -35,7 +63,9 @@ export type ShapeStroke = {
   w: number;
   h: number;
   rotation?: number;
+  fill?: string;
 };
+
 export type TextObject = {
   id: string;
   kind: "text";
@@ -123,10 +153,18 @@ export type CanvasObject =
 
 export type CanvasObjectKind = CanvasObject["kind"];
 
+export type BackgroundStyle = "blank" | "grid" | "dots" | "lined";
+// Legacy union kept for backward compat with older saved boards.
+export type LegacyBackground = "white" | "grid" | "dots" | "lined" | "dark";
+
 export type Page = {
   id: string;
   objects: CanvasObject[];
-  background: "white" | "grid" | "dots" | "lined" | "dark";
+  /** Legacy field, still honored for old boards. */
+  background: LegacyBackground;
+  /** New: independent style + color. */
+  bgStyle?: BackgroundStyle;
+  bgColor?: string;
 };
 
 export type WhiteboardState = {
@@ -139,4 +177,9 @@ export type WhiteboardState = {
   historyIndex: number;
   selectedId: string | null;
   camera: { x: number; y: number; zoom: number };
+  toolColors: Partial<Record<ToolId, string>>;
+  recentColors: string[];
+  favoriteColors: string[];
+  autoRecognizeShape: boolean;
 };
+

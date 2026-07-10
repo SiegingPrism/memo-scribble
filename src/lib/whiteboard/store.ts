@@ -1,9 +1,53 @@
 import { create } from "zustand";
-import type { CanvasObject, Page, ToolId, WhiteboardState } from "./types";
+import type {
+  BackgroundStyle,
+  CanvasObject,
+  Page,
+  ToolId,
+  WhiteboardState,
+} from "./types";
 import { pagesForTemplate, type TemplateKey } from "./templates";
+
 
 const STORAGE_KEY = "whiteboard.multi.v1";
 const LEGACY_KEY = "whiteboard.v1";
+const PREFS_KEY = "whiteboard.prefs.v1";
+
+type Prefs = {
+  toolColors: Partial<Record<ToolId, string>>;
+  recentColors: string[];
+  favoriteColors: string[];
+  autoRecognizeShape: boolean;
+};
+
+function defaultPrefs(): Prefs {
+  return {
+    toolColors: { pen: "#111827", highlighter: "#facc15", rainbow: "#ef4444", shape: "#0ea5e9", text: "#111827" },
+    recentColors: [],
+    favoriteColors: [],
+    autoRecognizeShape: true,
+  };
+}
+
+function loadPrefs(): Prefs {
+  if (typeof window === "undefined") return defaultPrefs();
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    if (!raw) return defaultPrefs();
+    return { ...defaultPrefs(), ...JSON.parse(raw) };
+  } catch {
+    return defaultPrefs();
+  }
+}
+
+function savePrefs(p: Prefs) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(p));
+  } catch {
+    /* ignore */
+  }
+}
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
@@ -11,6 +55,7 @@ function uid() {
 function nowMs() {
   return Date.now();
 }
+
 
 function emptyPage(background: Page["background"] = "white"): Page {
   return { id: uid(), objects: [], background };
@@ -116,9 +161,15 @@ type Actions = {
   nextPage: () => void;
   prevPage: () => void;
   setBackground: (bg: Page["background"]) => void;
+  setBackgroundStyle: (style: BackgroundStyle) => void;
+  setBackgroundColor: (color: string) => void;
+  setToolColor: (tool: ToolId, color: string) => void;
+  toggleFavoriteColor: (color: string) => void;
+  setAutoRecognizeShape: (v: boolean) => void;
   pushHistory: () => void;
   undo: () => void;
   redo: () => void;
+
   // Board CRUD
   createBoard: (opts?: { title?: string; templateKey?: TemplateKey; folderId?: string | null }) => string;
   openBoard: (id: string) => void;
@@ -175,6 +226,8 @@ function persistMeta(state: State) {
 
 export const useWhiteboard = create<State & Actions>((set, get) => {
   const initial = load();
+  const prefs = loadPrefs();
+  const initialColor = prefs.toolColors.pen ?? "#111827";
   return {
     // persist
     ...initial,
@@ -183,15 +236,73 @@ export const useWhiteboard = create<State & Actions>((set, get) => {
     pages: [emptyPage()],
     activePageId: "temp",
     tool: "pen",
-    color: "#111827",
+    color: initialColor,
     size: 3,
     history: [],
     historyIndex: -1,
     selectedId: null,
     camera: { x: 0, y: 0, zoom: 1 },
+    toolColors: prefs.toolColors,
+    recentColors: prefs.recentColors,
+    favoriteColors: prefs.favoriteColors,
+    autoRecognizeShape: prefs.autoRecognizeShape,
 
-    setTool: (tool) => set({ tool, selectedId: tool === "select" ? get().selectedId : null }),
-    setColor: (color) => set({ color }),
+    setTool: (tool) => {
+      const s = get();
+      const saved = s.toolColors[tool];
+      set({
+        tool,
+        selectedId: tool === "select" ? s.selectedId : null,
+        color: saved ?? s.color,
+      });
+    },
+    setColor: (color) => {
+      const s = get();
+      const toolColors = { ...s.toolColors, [s.tool]: color };
+      const recentColors = [color, ...s.recentColors.filter((c) => c !== color)].slice(0, 12);
+      savePrefs({
+        toolColors,
+        recentColors,
+        favoriteColors: s.favoriteColors,
+        autoRecognizeShape: s.autoRecognizeShape,
+      });
+      set({ color, toolColors, recentColors });
+    },
+    setToolColor: (tool, color) => {
+      const s = get();
+      const toolColors = { ...s.toolColors, [tool]: color };
+      savePrefs({
+        toolColors,
+        recentColors: s.recentColors,
+        favoriteColors: s.favoriteColors,
+        autoRecognizeShape: s.autoRecognizeShape,
+      });
+      set({ toolColors, color: s.tool === tool ? color : s.color });
+    },
+    toggleFavoriteColor: (color) => {
+      const s = get();
+      const exists = s.favoriteColors.includes(color);
+      const favoriteColors = exists
+        ? s.favoriteColors.filter((c) => c !== color)
+        : [color, ...s.favoriteColors].slice(0, 16);
+      savePrefs({
+        toolColors: s.toolColors,
+        recentColors: s.recentColors,
+        favoriteColors,
+        autoRecognizeShape: s.autoRecognizeShape,
+      });
+      set({ favoriteColors });
+    },
+    setAutoRecognizeShape: (v) => {
+      const s = get();
+      savePrefs({
+        toolColors: s.toolColors,
+        recentColors: s.recentColors,
+        favoriteColors: s.favoriteColors,
+        autoRecognizeShape: v,
+      });
+      set({ autoRecognizeShape: v });
+    },
     setSize: (size) => set({ size }),
     setSelected: (id) => set({ selectedId: id }),
     setCamera: (camera) => set({ camera }),
@@ -254,9 +365,31 @@ export const useWhiteboard = create<State & Actions>((set, get) => {
     },
     setBackground: (bg) => {
       const s = get();
-      const pages = s.pages.map((p) => (p.id === s.activePageId ? { ...p, background: bg } : p));
+      // Bug fix: never mutate before a board is opened; would corrupt the "temp" page
+      // and could ghost into a fresh board later. No-op until openBoard has run.
+      if (!s.activeBoardId || !s.boards[s.activeBoardId]) return;
+      const pages = s.pages.map((p) =>
+        p.id === s.activePageId ? { ...p, background: bg } : p,
+      );
       set(syncActive({ ...s, pages }));
     },
+    setBackgroundStyle: (style) => {
+      const s = get();
+      if (!s.activeBoardId || !s.boards[s.activeBoardId]) return;
+      const pages = s.pages.map((p) =>
+        p.id === s.activePageId ? { ...p, bgStyle: style } : p,
+      );
+      set(syncActive({ ...s, pages }));
+    },
+    setBackgroundColor: (color) => {
+      const s = get();
+      if (!s.activeBoardId || !s.boards[s.activeBoardId]) return;
+      const pages = s.pages.map((p) =>
+        p.id === s.activePageId ? { ...p, bgColor: color } : p,
+      );
+      set(syncActive({ ...s, pages }));
+    },
+
     pushHistory: () => {
       const s = get();
       const snap = structuredClone(s.pages);

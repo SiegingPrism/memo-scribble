@@ -63,12 +63,15 @@ export function finalizeStroke(
   color: string,
   size: number,
   points: Point[],
+  autoRecognize = true,
 ): CanvasObject | null {
   if (points.length < 2) return null;
   const id = uid();
   if (tool === "shape") {
-    const rec = recognizeShape(points, color, size);
-    if (rec) return { id, ...rec };
+    if (autoRecognize) {
+      const rec = recognizeShape(points, color, size);
+      if (rec) return { id, ...rec };
+    }
     return { id, kind: "pen", color, size, points };
   }
   if (tool === "pen") return { id, kind: "pen", color, size, points };
@@ -77,6 +80,7 @@ export function finalizeStroke(
   if (tool === "dashed") return { id, kind: "dashed", color, size, points };
   return null;
 }
+
 
 /** Animated fade for the laser trail. */
 export function animateLaserFade(

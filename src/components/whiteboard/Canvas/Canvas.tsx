@@ -30,7 +30,9 @@ export function WhiteboardCanvas() {
     setSelected,
     setCamera,
     pushHistory,
+    autoRecognizeShape,
   } = useWhiteboard();
+
 
   const page = pages.find((p) => p.id === activePageId)!;
   const [dpr, setDpr] = useState(1);
@@ -86,7 +88,7 @@ export function WhiteboardCanvas() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, c.width, c.height);
     ctx.scale(dpr, dpr);
-    drawBackground(ctx, c.width / dpr, c.height / dpr, page.background, camera);
+    drawBackground(ctx, c.width / dpr, c.height / dpr, page, camera);
     ctx.save();
     ctx.translate(camera.x, camera.y);
     ctx.scale(camera.zoom, camera.zoom);
@@ -243,7 +245,7 @@ export function WhiteboardCanvas() {
         animateLaserFade(overlay, dpr, camera, laserRef.current);
         return;
       }
-      const obj = finalizeStroke(tool, color, size, d.points);
+      const obj = finalizeStroke(tool, color, size, d.points, autoRecognizeShape);
       if (obj) {
         addObject(obj);
         pushHistory();
