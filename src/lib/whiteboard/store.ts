@@ -11,6 +11,43 @@ import { pagesForTemplate, type TemplateKey } from "./templates";
 
 const STORAGE_KEY = "whiteboard.multi.v1";
 const LEGACY_KEY = "whiteboard.v1";
+const PREFS_KEY = "whiteboard.prefs.v1";
+
+type Prefs = {
+  toolColors: Partial<Record<ToolId, string>>;
+  recentColors: string[];
+  favoriteColors: string[];
+  autoRecognizeShape: boolean;
+};
+
+function defaultPrefs(): Prefs {
+  return {
+    toolColors: { pen: "#111827", highlighter: "#facc15", rainbow: "#ef4444", shape: "#0ea5e9", text: "#111827" },
+    recentColors: [],
+    favoriteColors: [],
+    autoRecognizeShape: true,
+  };
+}
+
+function loadPrefs(): Prefs {
+  if (typeof window === "undefined") return defaultPrefs();
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    if (!raw) return defaultPrefs();
+    return { ...defaultPrefs(), ...JSON.parse(raw) };
+  } catch {
+    return defaultPrefs();
+  }
+}
+
+function savePrefs(p: Prefs) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(p));
+  } catch {
+    /* ignore */
+  }
+}
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
@@ -18,6 +55,7 @@ function uid() {
 function nowMs() {
   return Date.now();
 }
+
 
 function emptyPage(background: Page["background"] = "white"): Page {
   return { id: uid(), objects: [], background };
