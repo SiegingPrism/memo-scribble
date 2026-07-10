@@ -30,7 +30,9 @@ export function WhiteboardCanvas() {
     setSelected,
     setCamera,
     pushHistory,
+    autoRecognizeShape,
   } = useWhiteboard();
+
 
   const page = pages.find((p) => p.id === activePageId)!;
   const [dpr, setDpr] = useState(1);
