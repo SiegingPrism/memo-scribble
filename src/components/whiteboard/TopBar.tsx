@@ -47,11 +47,13 @@ export function TopBar({
     addPage,
     undo,
     redo,
-    setBackground,
+    setBackgroundStyle,
+    setBackgroundColor,
     addObject,
     pushHistory,
     createBoard,
   } = useWhiteboard();
+
   const navigate = useNavigate();
 
   const fileRef = useRef<HTMLInputElement>(null);
