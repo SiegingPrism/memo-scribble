@@ -37,7 +37,7 @@ export function generatePageThumbnail(page: Page): string | null {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  ctx.fillStyle = bgColor(page.background);
+  ctx.fillStyle = pageBgColor(page);
   ctx.fillRect(0, 0, THUMB_W, THUMB_H);
 
   // Center content
