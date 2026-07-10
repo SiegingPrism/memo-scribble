@@ -1,12 +1,14 @@
 import type { Page } from "./types";
 import { drawObject, objectBounds } from "@/components/whiteboard/Canvas/renderer";
+import { resolveBackground } from "@/components/whiteboard/Canvas/background";
 
 const THUMB_W = 400;
 const THUMB_H = 300;
 
-function bgColor(bg: Page["background"]): string {
-  return bg === "dark" ? "#0f172a" : "#ffffff";
+function pageBgColor(page: Page): string {
+  return resolveBackground(page).color;
 }
+
 
 /** Render a page's objects to a small dataURL thumbnail. Returns null if empty. */
 export function generatePageThumbnail(page: Page): string | null {
