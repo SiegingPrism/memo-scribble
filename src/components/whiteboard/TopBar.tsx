@@ -1,7 +1,9 @@
 import { useRef, useState } from "react";
 import { useWhiteboard } from "@/lib/whiteboard/store";
-import type { ImageObject } from "@/lib/whiteboard/types";
+import type { BackgroundStyle, ImageObject } from "@/lib/whiteboard/types";
 import { TEMPLATES, type TemplateKey } from "@/lib/whiteboard/templates";
+import { BACKGROUND_COLORS, BACKGROUND_STYLES, resolveBackground } from "./Canvas/background";
+
 import {
   Upload,
   Download,
