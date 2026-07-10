@@ -161,9 +161,15 @@ type Actions = {
   nextPage: () => void;
   prevPage: () => void;
   setBackground: (bg: Page["background"]) => void;
+  setBackgroundStyle: (style: BackgroundStyle) => void;
+  setBackgroundColor: (color: string) => void;
+  setToolColor: (tool: ToolId, color: string) => void;
+  toggleFavoriteColor: (color: string) => void;
+  setAutoRecognizeShape: (v: boolean) => void;
   pushHistory: () => void;
   undo: () => void;
   redo: () => void;
+
   // Board CRUD
   createBoard: (opts?: { title?: string; templateKey?: TemplateKey; folderId?: string | null }) => string;
   openBoard: (id: string) => void;
