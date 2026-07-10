@@ -245,21 +245,59 @@ export function TopBar({
             <Grid3x3 className="h-5 w-5" />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-44 p-1">
-          {(["white", "grid", "dots", "lined", "dark"] as const).map((bg) => (
-            <button
-              key={bg}
-              onClick={() => setBackground(bg)}
-              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm capitalize hover:bg-accent"
-            >
-              <Layout className="h-4 w-4" /> {bg}
-              {page.background === bg && (
-                <span className="ml-auto text-xs text-primary">✓</span>
-              )}
-            </button>
-          ))}
+        <PopoverContent className="w-72 space-y-3">
+          {(() => {
+            const { style, color } = resolveBackground(page);
+            return (
+              <>
+                <div>
+                  <div className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <Layout className="h-3.5 w-3.5" /> Style
+                  </div>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {BACKGROUND_STYLES.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setBackgroundStyle(s as BackgroundStyle)}
+                        className={`rounded-md border p-1.5 text-xs capitalize transition hover:bg-accent ${
+                          style === s ? "border-primary bg-primary/10" : "border-border"
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Color
+                  </div>
+                  <div className="grid grid-cols-7 gap-1.5">
+                    {BACKGROUND_COLORS.map((c) => (
+                      <button
+                        key={c.name}
+                        title={c.name}
+                        onClick={() => setBackgroundColor(c.hex)}
+                        className={`h-7 w-7 rounded-full ring-2 transition ${
+                          color.toLowerCase() === c.hex.toLowerCase() ? "ring-primary" : "ring-border"
+                        }`}
+                        style={{ backgroundColor: c.hex }}
+                      />
+                    ))}
+                  </div>
+                  <input
+                    type="color"
+                    value={color}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                    className="mt-2 h-8 w-full cursor-pointer rounded"
+                  />
+                </div>
+              </>
+            );
+          })()}
         </PopoverContent>
       </Popover>
+
 
       <button className={btn} onClick={onOpenWidgets} title="Widgets">
         <Package className="h-5 w-5" />
