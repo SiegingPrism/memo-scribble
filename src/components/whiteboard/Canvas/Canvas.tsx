@@ -258,6 +258,27 @@ export function WhiteboardCanvas() {
     setCamera(wheelZoom(camera, e, rect));
   }
 
+  function onDoubleClick(e: React.MouseEvent<HTMLCanvasElement>) {
+    const rect = canvasRef.current!.getBoundingClientRect();
+    const w = toWorld(camera, e.clientX - rect.left, e.clientY - rect.top);
+    const hit = hitTest(page.objects, w);
+    if (!hit) return;
+    if (hit.kind === "flashcard") {
+      updateObject(hit.id, { flipped: !hit.flipped } as Partial<CanvasObject>);
+      pushHistory();
+    } else if (hit.kind === "quiz") {
+      updateObject(hit.id, { revealed: !hit.revealed } as Partial<CanvasObject>);
+      pushHistory();
+    } else if (hit.kind === "roadmap") {
+      const next = hit.status === "todo" ? "doing" : hit.status === "doing" ? "done" : "todo";
+      updateObject(hit.id, { status: next } as Partial<CanvasObject>);
+      pushHistory();
+    } else if (hit.kind === "text" || hit.kind === "sticky") {
+      setSelected(hit.id);
+      if (hit.kind === "text") setEditingText({ id: hit.id });
+    }
+  }
+
   const editing = editingText
     ? (page.objects.find((o) => o.id === editingText.id) as TextObject | undefined)
     : undefined;
