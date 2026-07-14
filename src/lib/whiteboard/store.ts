@@ -314,6 +314,13 @@ export const useWhiteboard = create<State & Actions>((set, get) => {
       );
       set(syncActive({ ...s, pages }));
     },
+    addObjects: (objs: CanvasObject[]) => {
+      const s = get();
+      const pages = s.pages.map((p) =>
+        p.id === s.activePageId ? { ...p, objects: [...p.objects, ...objs] } : p,
+      );
+      set(syncActive({ ...s, pages }));
+    },
     updateObject: (id, patch) => {
       const s = get();
       const pages = s.pages.map((p) =>
