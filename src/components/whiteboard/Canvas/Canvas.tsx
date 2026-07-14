@@ -292,6 +292,7 @@ export function WhiteboardCanvas() {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
+        onDoubleClick={onDoubleClick}
         onWheel={onWheel}
         style={{ cursor: tool === "pan" ? "grab" : tool === "select" ? "default" : "crosshair" }}
       />
