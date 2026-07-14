@@ -152,6 +152,7 @@ type Actions = {
   setCamera: (c: { x: number; y: number; zoom: number }) => void;
   // Active board content
   addObject: (obj: CanvasObject) => void;
+  addObjects: (objs: CanvasObject[]) => void;
   updateObject: (id: string, patch: Partial<CanvasObject>) => void;
   deleteObject: (id: string) => void;
   clearPage: () => void;
