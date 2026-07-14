@@ -192,7 +192,7 @@ registerObject<FlashcardObject>({
     drawCard(ctx, o, {
       fill: o.color || "#fef3c7",
       headerColor: "#a16207",
-      header: o.flipped ? "BACK" : "FRONT",
+      header: o.flipped ? "BACK (double-click)" : "FRONT (double-click)",
       body: [o.flipped ? o.back : o.front],
     }),
   bounds: boxBounds,
@@ -200,13 +200,18 @@ registerObject<FlashcardObject>({
 registerObject<QuizObject>({
   kind: "quiz",
   label: "Quiz",
-  draw: (o, { ctx }) =>
+  draw: (o, { ctx }) => {
+    const opts = o.options.map((opt, i) => {
+      const marker = o.revealed && i === o.answerIndex ? "✓" : `${String.fromCharCode(65 + i)}.`;
+      return `${marker} ${opt}`;
+    });
     drawCard(ctx, o, {
-      fill: "#ede9fe",
-      headerColor: "#6d28d9",
-      header: "QUIZ",
-      body: [o.question, ...o.options.map((opt, i) => `${String.fromCharCode(65 + i)}. ${opt}`)],
-    }),
+      fill: o.revealed ? "#dcfce7" : "#ede9fe",
+      headerColor: o.revealed ? "#15803d" : "#6d28d9",
+      header: o.revealed ? "QUIZ · ANSWER REVEALED" : "QUIZ (double-click to reveal)",
+      body: [o.question, ...opts],
+    });
+  },
   bounds: boxBounds,
 });
 registerObject<RoadmapNodeObject>({

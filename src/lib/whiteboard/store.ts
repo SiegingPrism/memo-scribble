@@ -152,6 +152,7 @@ type Actions = {
   setCamera: (c: { x: number; y: number; zoom: number }) => void;
   // Active board content
   addObject: (obj: CanvasObject) => void;
+  addObjects: (objs: CanvasObject[]) => void;
   updateObject: (id: string, patch: Partial<CanvasObject>) => void;
   deleteObject: (id: string) => void;
   clearPage: () => void;
@@ -311,6 +312,13 @@ export const useWhiteboard = create<State & Actions>((set, get) => {
       const s = get();
       const pages = s.pages.map((p) =>
         p.id === s.activePageId ? { ...p, objects: [...p.objects, obj] } : p,
+      );
+      set(syncActive({ ...s, pages }));
+    },
+    addObjects: (objs: CanvasObject[]) => {
+      const s = get();
+      const pages = s.pages.map((p) =>
+        p.id === s.activePageId ? { ...p, objects: [...p.objects, ...objs] } : p,
       );
       set(syncActive({ ...s, pages }));
     },

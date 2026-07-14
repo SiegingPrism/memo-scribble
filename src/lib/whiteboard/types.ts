@@ -113,6 +113,7 @@ export type QuizObject = BoxBase & {
   question: string;
   options: string[];
   answerIndex: number;
+  revealed?: boolean;
 };
 export type RoadmapNodeObject = BoxBase & {
   kind: "roadmap";
