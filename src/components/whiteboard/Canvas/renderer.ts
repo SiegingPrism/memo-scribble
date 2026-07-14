@@ -192,7 +192,7 @@ registerObject<FlashcardObject>({
     drawCard(ctx, o, {
       fill: o.color || "#fef3c7",
       headerColor: "#a16207",
-      header: o.flipped ? "BACK" : "FRONT",
+      header: o.flipped ? "BACK (double-click)" : "FRONT (double-click)",
       body: [o.flipped ? o.back : o.front],
     }),
   bounds: boxBounds,
