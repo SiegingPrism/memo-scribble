@@ -75,12 +75,12 @@ export const generateLearningObjects = createServerFn({ method: "POST" })
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
     const schema = schemas[data.kind];
-    const { experimental_output: output } = await generateText({
+    const { output } = await generateText({
       model: gateway("google/gemini-3-flash-preview"),
       system:
         "You are an educational content generator. Output only valid JSON matching the schema. Keep text concise and accurate.",
       prompt: prompts[data.kind](data.topic),
-      experimental_output: Output.object({ schema }),
+      output: Output.object({ schema: schema as unknown as z.ZodType }),
     });
     return { kind: data.kind, topic: data.topic, output } as const;
   });
